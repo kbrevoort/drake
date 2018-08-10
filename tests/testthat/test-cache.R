@@ -9,7 +9,7 @@ test_with_dir("dependency profile", {
     regexp = "no recorded metadata"
   )
   expect_false(any(dependency_profile(target = a, config = config)$changed))
-  b <- 2
+  config$envir$b <- 2
   expect_false(any(dependency_profile(target = a, config = config)$changed))
   config$skip_targets <- TRUE
   make(config = config)

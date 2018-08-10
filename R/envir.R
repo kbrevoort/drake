@@ -9,6 +9,31 @@ assign_to_envir <- function(target, value, config){
   invisible()
 }
 
+drake_envir <- function(plan, old){
+  names <- setdiff(ls(old, all.names = TRUE), plan$target)
+  new <- new.env(parent = globalenv())
+  lapply(
+    X = names,
+    FUN = reassign_object,
+    old = old,
+    new = new
+  )
+  new
+}
+
+reassign_object <- function(name, old, new){
+  object <- get(name, envir = old, inherits = FALSE)
+  if (rlang::is_closure(object)){
+    object <- rlang::new_function(
+      args = formals(object),
+      body = body(object),
+      env = new
+    )
+  }
+  assign(x = name, value = object, envir = new, inherits = FALSE)
+  invisible()
+}
+
 #' @title Prune the evaluation environment
 #' @description Load targets that you need to build the targets
 #'   and unload the ones you will never need again in the
@@ -105,7 +130,7 @@ flexible_get <- function(target, envir) {
   lang <- parsed[[1]]
   is_namespaced <- length(lang) > 1
   if (!is_namespaced){
-    return(get(x = target, envir = envir))
+    return(get(x = target, envir = envir, inherits = TRUE))
   }
   stopifnot(deparse(lang[[1]]) %in% c("::", ":::"))
   pkg <- deparse(lang[[2]])

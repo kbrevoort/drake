@@ -432,6 +432,7 @@ drake_config <- function(
   template = list()
 ){
   force(envir)
+  envir <- drake_envir(plan = plan, old = envir)
   unlink(console_log_file)
   if (!is.null(imports_only)){
     warning(

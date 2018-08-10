@@ -147,9 +147,6 @@ test_with_dir("Vectorized nested functions work", {
   expect_equal(clean_dependency_list(deps_code(e$g)), "y")
 
   config <- testrun(config)
-  if ("a" %in% ls(config$envir)){
-    rm(a, envir = config$envir)
-  }
   expect_equal(readd(a), 8:17)
   k <- readd(f)
   expect_equal(k(2:5), 9:12)
